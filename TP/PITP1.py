@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 plt.close('all')
 
 #changing directory to where the image is located
-os.chdir('C:/Users/Eow/Pictures/')
+os.chdir('C:/Users/silam/OneDrive/Desktop')
 #assign variable ima to a read of the picture we want to use
 ima=imread('lena.tif')
 
@@ -62,7 +62,7 @@ import numpy as np
 #creating a new copy of the original image to avoid overwritting
 img1= np.copy(ima)
 #replace the area we cropped in the last exercise with a box of a certain color (10 in this case)
-img1[linha_cse:linha_cid, coluna_cse:coluna_cid] = 10
+img1[linha_cse:linha_cid, coluna_cse:coluna_cid] = 149
 #plot the new figure
 plt.figure (); plt.imshow(img1, 'gray')
 plt.title('substituicao'); plt.axis ('off')
