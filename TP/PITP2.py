@@ -18,7 +18,7 @@ plt.close('all')
 laptop='C:/Users/Eow/Desktop/Mestrado/PDI/TP'
 pc='C:/Users/silam/OneDrive/Desktop/Mestrado/PDI/TP'
 #changing directory to where the image is located
-os.chdir(pc)
+os.chdir(laptop)
 
 
 #abrir imagem de 8 bits as type float - permite que sejam feitas operacoes
@@ -39,6 +39,9 @@ filtro = np.array([[1,1,1],
                    [1,1,1],
                    [1,1,1]],
                   dtype='float')/9
+
+#em cima 'e o mesmo que
+#filtro= np.ones((3,3))/9
 
 filtro1= np.ones((5,5))
 filtro2= np.ones((9,9))
@@ -165,24 +168,64 @@ plt.subplot(141); plt.imshow(conv3, 'gray')
 noise=imread('Stripping_Noise.tif').astype(float)
 
 #aplicar um filtro de passa baixa e aplicar de seguida um filtro passa alta sobre o resultado
-mean_noise = ndimage.convolve(noise,filtro,mode='constant', cval=0)
-sobel_noisex= ndimage.sobel(mean_noise, axis=0, mode='constant')
-sobel_noisey= ndimage.sobel(mean_noise, axis=1, mode='constant')
-sobel_noise = np.hypot(sobel_noisex, sobel_noisey)
+# mean_noise = ndimage.convolve(noise,filtro,mode='constant', cval=0)
+# sobel_noisex= ndimage.sobel(mean_noise, axis=0, mode='constant')
+# sobel_noisey= ndimage.sobel(mean_noise, axis=1, mode='constant')
+# sobel_noise = np.hypot(sobel_noisex, sobel_noisey)
 
 #teste para passa alta da imagem original
-sobel_noisex1= ndimage.sobel(noise, axis=0, mode='constant')
-sobel_noisey1= ndimage.sobel(noise, axis=1, mode='constant')
-sobel_noise1 = np.hypot(sobel_noisex1, sobel_noisey1)
+# sobel_noisex1= ndimage.sobel(noise, axis=0, mode='constant')
+# sobel_noisey1= ndimage.sobel(noise, axis=1, mode='constant')
+# sobel_noise1 = np.hypot(sobel_noisex1, sobel_noisey1)
 
+
+
+#passa baixa
+#zfinal = 1/9 *z(i-1, j-1)+1/9*z(i-1,j).... etc
+#
+#Passa Alta
+# Ima-PB = z(i,j)-PB
+# z(i,j)-[z(i-1, j-1)+1/9*z(i-1,j).... etc]
+# so o valor central tem valor positivo 8/9 z(i,j)
+
+filtro_pa = np.array([[-1,-1,-1],
+                      [-1, 8,-1],
+                      [-1,-1,-1]])/9
+
+conv4 = ndimage.convolve(noise, filtro_pa, mode='constant', cval=0)
+
+#soma devera ser igual 'a imagem original
+soma=mean_noise + conv4                        
+                        
 #plot das figuras
-plt.figure(figsize=(14,5))
+plt.figure()
 plt.subplot(141); plt.imshow(noise, 'gray'); plt.title('original')
 plt.subplot(142); plt.imshow(mean_noise, 'gray'); plt.title('Passa Baixa')
-plt.subplot(143); plt.imshow(sobel_noise, 'gray'); plt.title('Passa Alta')
-plt.subplot(144); plt.imshow(sobel_noise1, 'gray'); plt.title('test')
-
-
-
-                                         
+plt.subplot(143); plt.imshow(np.abs(conv4), vmin=np.min(conv4), vmax=np.max(conv4)); plt.title('Passa Alta')
+plt.subplot(144); plt.imshow(soma, 'gray'); plt.title('Soma')
+# plt.subplot(144); plt.imshow(sobel_noise1, 'gray'); plt.title('test')
              
+filtroruido = np.ones((21,201))/(21*201)
+
+pb1 = ndimage.convolve(noise, filtroruido, mode='constant', cval=0)
+pa1 = noise-pb1
+
+
+
+filtroruido2 = np.ones((5,201))/(5*201)
+
+pb2 = ndimage.convolve(noise, filtroruido2, mode='constant', cval=0)
+pa2 = noise-pb2
+
+plt.figure()
+plt.subplot(221); plt.imshow(noise, 'gray'); plt.title('original')
+plt.subplot(222); plt.imshow(pb1, 'gray'); plt.title('Passa Baixa')
+plt.subplot(243); plt.imshow(pa1, 'gray', vmin=0, vmax=255); plt.title('Passa Alta')
+#falta o resto das vizualizacoes
+
+
+final = pb1+pa2
+
+plt.subplot(121); plt.imshow(noise, 'gray'); plt.title('original')
+plt.subplot(122); plt.imshow(final, 'gray'); plt.title('final'); plt.axis('off')
+
