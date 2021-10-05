@@ -18,7 +18,7 @@ plt.close('all')
 laptop='C:/Users/Eow/Desktop/Mestrado/PDI/TP'
 pc='C:/Users/silam/OneDrive/Desktop/Mestrado/PDI/TP'
 #changing directory to where the image is located
-os.chdir(laptop)
+os.chdir(pc)
 
 
 #abrir imagem de 8 bits as type float - permite que sejam feitas operacoes
@@ -168,10 +168,10 @@ plt.subplot(141); plt.imshow(conv3, 'gray')
 noise=imread('Stripping_Noise.tif').astype(float)
 
 #aplicar um filtro de passa baixa e aplicar de seguida um filtro passa alta sobre o resultado
-# mean_noise = ndimage.convolve(noise,filtro,mode='constant', cval=0)
-# sobel_noisex= ndimage.sobel(mean_noise, axis=0, mode='constant')
-# sobel_noisey= ndimage.sobel(mean_noise, axis=1, mode='constant')
-# sobel_noise = np.hypot(sobel_noisex, sobel_noisey)
+mean_noise = ndimage.convolve(noise,filtro,mode='constant', cval=0)
+sobel_noisex= ndimage.sobel(mean_noise, axis=0, mode='constant')
+sobel_noisey= ndimage.sobel(mean_noise, axis=1, mode='constant')
+sobel_noise = np.hypot(sobel_noisex, sobel_noisey)
 
 #teste para passa alta da imagem original
 # sobel_noisex1= ndimage.sobel(noise, axis=0, mode='constant')
