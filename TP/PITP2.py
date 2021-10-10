@@ -169,15 +169,6 @@ noise=imread('Stripping_Noise.tif').astype(float)
 
 #aplicar um filtro de passa baixa e aplicar de seguida um filtro passa alta sobre o resultado
 mean_noise = ndimage.convolve(noise,filtro,mode='constant', cval=0)
-sobel_noisex= ndimage.sobel(mean_noise, axis=0, mode='constant')
-sobel_noisey= ndimage.sobel(mean_noise, axis=1, mode='constant')
-sobel_noise = np.hypot(sobel_noisex, sobel_noisey)
-
-#teste para passa alta da imagem original
-# sobel_noisex1= ndimage.sobel(noise, axis=0, mode='constant')
-# sobel_noisey1= ndimage.sobel(noise, axis=1, mode='constant')
-# sobel_noise1 = np.hypot(sobel_noisex1, sobel_noisey1)
-
 
 
 #passa baixa
@@ -203,25 +194,26 @@ plt.subplot(141); plt.imshow(noise, 'gray'); plt.title('original')
 plt.subplot(142); plt.imshow(mean_noise, 'gray'); plt.title('Passa Baixa')
 plt.subplot(143); plt.imshow(np.abs(conv4), vmin=np.min(conv4), vmax=np.max(conv4)); plt.title('Passa Alta')
 plt.subplot(144); plt.imshow(soma, 'gray'); plt.title('Soma')
-# plt.subplot(144); plt.imshow(sobel_noise1, 'gray'); plt.title('test')
              
-filtroruido = np.ones((21,201))/(21*201)
 
+
+#criar um filtro com tamanho de bandas que contenham o ruido
+filtroruido = np.ones((21,201))/(21*201)
 pb1 = ndimage.convolve(noise, filtroruido, mode='constant', cval=0)
 pa1 = noise-pb1
 
-
-
+#criar um filtro com tamanho de bandas mais pequeno que o ruido
+#se mudar-mos o tamanho dos filtros podemos tentar encontrar uma melhor solucao
 filtroruido2 = np.ones((5,201))/(5*201)
 
 pb2 = ndimage.convolve(noise, filtroruido2, mode='constant', cval=0)
 pa2 = noise-pb2
 
+#ver o efeito de cada um dos filtros
 plt.figure()
 plt.subplot(221); plt.imshow(noise, 'gray'); plt.title('original')
 plt.subplot(222); plt.imshow(pb1, 'gray'); plt.title('Passa Baixa')
 plt.subplot(243); plt.imshow(pa1, 'gray', vmin=0, vmax=255); plt.title('Passa Alta')
-#falta o resto das vizualizacoes
 
 
 final = pb1+pa2
