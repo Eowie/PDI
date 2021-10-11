@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-from scipy import ndimage
+import scipy
 from imageio import imread
 
 plt.close('all')
@@ -9,7 +9,7 @@ plt.close('all')
 laptop='C:/Users/Eow/Desktop/Mestrado/PDI/TP'
 pc='C:/Users/silam/OneDrive/Desktop/Mestrado/PDI/TP'
 #changing directory to where the image is located
-os.chdir(pc)
+os.chdir(laptop)
 
 
 #ex1
@@ -125,8 +125,8 @@ F=np.zeros(f.shape)
 for u in range (2):
     for v in range (2):
                 F[u,v]= f[0,0]*np.e**(complex(0,-2*np.pi*((u*0)/M+(v*0)/N)))+ \
-                        f[1,0]*np.e**(complex(0,-2*np.pi*((u*0)/M+(v*1)/N)))+ \
-                        f[0,1]*np.e**(complex(0,-2*np.pi*((u*1)/M+(v*0)/N)))+ \
+                        f[1,0]*np.e**(complex(0,-2*np.pi*((u*1)/M+(v*0)/N)))+ \
+                        f[0,1]*np.e**(complex(0,-2*np.pi*((u*0)/M+(v*1)/N)))+ \
                         f[1,1]*np.e**(complex(0,-2*np.pi*((u*1)/M+(v*1)/N)))
 
 #representacao nr complexo z=complex(2,3)
@@ -137,9 +137,132 @@ F1=np.zeros(f.shape)
 
 for x in range (2):
     for y in range (2):
-                F1[x,y]= 1/(M*N)* (F[0,0]*np.e**(complex(0,2*np.pi*((x*0)/M+(y*0)/N)))+ \
-                                    F[1,0]*np.e**(complex(0,2*np.pi*((x*0)/M+(y*1)/N)))+ \
-                                    F[0,1]*np.e**(complex(0,2*np.pi*((x*1)/M+(y*0)/N)))+ \
+                F1[x,y]= 1/(M*N)*  (F[0,0]*np.e**(complex(0,2*np.pi*((x*0)/M+(y*0)/N)))+ \
+                                    F[1,0]*np.e**(complex(0,2*np.pi*((x*1)/M+(y*0)/N)))+ \
+                                    F[0,1]*np.e**(complex(0,2*np.pi*((x*0)/M+(y*1)/N)))+ \
                                     F[1,1]*np.e**(complex(0,2*np.pi*((x*1)/M+(y*1)/N))))
 
 
+#ex 2.3
+mardfft=np.fft.fft2(ima)
+marespectro=abs(mardfft)
+
+marespectrolog=np.log10(abs(np.fft.fft2(ima)))
+marmi=np.log10(abs(np.fft.fftshift(mardfft)))
+marifft=abs(np.fft.ifft2(mardfft))
+
+#experimentar em casa fazer a ifft do espectro
+# marinv= np.fft.ifft2(np.log10(abs(np.fft.fftshift(mardfft))))
+
+
+plt.figure()
+plt.subplot(161); plt.imshow(ima, 'gray'); plt.axis('off'), plt.title('Original');
+plt.subplot(162); plt.imshow(marespectro, 'gray'); plt.axis('off'),plt.title('DFFT')
+plt.subplot(163); plt.imshow(marespectrolog, 'gray'); plt.axis('off'),plt.title('Espectro')
+plt.subplot(164); plt.imshow(marmi, 'gray'); plt.axis('off'),plt.title('Espelhado')
+plt.subplot(165); plt.imshow(marifft, 'gray'); plt.axis('off'),plt.title('IFFT')
+# plt.subplot(166); plt.imshow(np.uint8(np.abs(marinv)), 'gray'); plt.axis('off'),plt.title('IFFT do Espectro')
+
+
+
+#ex 3.1
+
+circles = imread('circles.tif')
+
+#a nr de linhas
+#b nr de colunas
+#f valor da frequencia
+#definir o filtro plano
+#criar uma mascara toda preenchida com valores a 1 com a linhas e b colunas
+#coloca no primeiro pixel um valor 0
+#coloca no ultimo pixel em coluna, em linha etc tudo a zeros
+#com D vai procurar todos os pixels onde o valor central seja inferior 
+
+
+
+circlesdfft=np.fft.fft2(circles)
+circlesespectro=np.log10(abs(circlesdfft))
+circlesmi=np.fft.fftshift(circlesespectro)
+
+
+def filtro_lp(a,b,freq):
+    mask= np.ones(circles.shape)
+    mask[0,0]=0
+    mask[0,-1]=0
+    mask[-1,0]=0
+    mask[-1,-1]=0
+    D= scipy.ndimage.distance_transform_edt(mask)
+    p= D<=freq
+    return p
+
+
+plt.figure()
+plt.subplot(251); plt.imshow(circles, 'gray')
+plt.subplot(252); plt.imshow(circlesespectro, 'gray')
+plt.subplot(253); plt.imshow(circlesmi,'gray')
+
+frequencia=50
+filtrox=filtro_lp(circles.shape[0],circles.shape[1],frequencia)
+
+plt.subplot(254); plt.imshow(filtrox)
+plt.subplot(255); plt.imshow(filtrox*circlesespectro, 'gray')
+
+circles_filtrada= np.fft.ifft2(filtrox*circlesdfft)
+plt.subplot(256); plt.imshow(np.abs(circles_filtrada),'gray')
+#vmin vmax para homogenezar a imagemm na frequencia no 0
+
+
+
+#mudanca dos quadrantes
+#permite saber quais as frequencias q estao a ser retiradas do espectro centrado
+# plt.imshow(np.fft.fftshift(circlesfiltro))
+
+#para fazer isto no espectro nao centrado tem de se multiplicar o filtro original pelo espectro original
+#fazer estes para a imagem marylin tambem
+
+
+def gauss_lp_2d(lin,col,mu,sigma):
+    x, y = np.meshgrid(np.linspace(-col/2, col/2, col),\
+                        np.linspace(-lin/2, lin/2, lin))
+    g= np.exp(-((x-mu)**2+(y-mu)**2)/(2*sigma**2))
+    return g
+    
+
+mu= 0
+sigma= frequencia
+filtroy= np.fft.fftshift(gauss_lp_2d(circles.shape[0], circles.shape[1], mu, sigma ))
+circles_filtradoy=np.fft.ifft2(filtroy*circlesdfft)
+
+plt.subplot(257); plt.imshow(np.abs(circles_filtradoy),'gray')
+    
+
+
+
+# # ex 3.2
+
+noise = imread('Stripping_Noise.tif')
+noisedfft=np.fft.fft2(noise)
+noiseespectro=abs(noisedfft)
+noiseespectrolog=np.log10(abs(noisedfft))
+noisemi=np.log10(abs(np.fft.fftshift(noisedfft)))
+noiseifft=abs(np.fft.ifft2(noisedfft))
+
+
+lin=noise.shape[0]
+col=noise.shape[1]
+mask1= noisemi>=3
+mask2= np.zeros(noise.shape)
+q=5
+mask2[q:int(lin/2), 0:q] =1; mask2[int(lin/2):lin-q, 0:q]=1
+mask2[q:int(lin/2), col-q+1:col] =1; mask2[int(lin/2):lin-q, col-q+1:col]=1
+mask3 = np.fft.ifftshift(mask2)
+mask4 = np.logical_not(np.logical_and(mask1,mask3))
+maskx = np.logical_not(np.logical_and(mask1,mask2)) 
+test=np.abs(np.fft.ifft2(maskx*noisedfft))
+
+
+plt.figure()                                                                    
+plt.subplot(251); plt.imshow(noise, 'gray')
+plt.subplot(252); plt.imshow(noisemi, 'gray')
+plt.subplot(253); plt.imshow(mask4, 'gray')
+plt.subplot(254); plt.imshow(test, 'gray')
