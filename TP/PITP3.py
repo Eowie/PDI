@@ -3,13 +3,14 @@ import os
 import matplotlib.pyplot as plt
 import scipy
 from imageio import imread
+import scipy.ndimage
 
 plt.close('all')
 #definir variaveis consoante o pc a usar para facilitar mudanca de pc
 laptop='C:/Users/Eow/Desktop/Mestrado/PDI/TP'
 pc='C:/Users/silam/OneDrive/Desktop/Mestrado/PDI/TP'
 #changing directory to where the image is located
-os.chdir(laptop)
+os.chdir(pc)
 
 
 #ex1
@@ -241,6 +242,7 @@ plt.subplot(257); plt.imshow(np.abs(circles_filtradoy),'gray')
 # # ex 3.2
 
 noise = imread('Stripping_Noise.tif')
+#dft em 2D
 noisedfft=np.fft.fft2(noise)
 noiseespectro=abs(noisedfft)
 noiseespectrolog=np.log10(abs(noisedfft))
@@ -250,19 +252,48 @@ noiseifft=abs(np.fft.ifft2(noisedfft))
 
 lin=noise.shape[0]
 col=noise.shape[1]
+
+#define duas mascaras para a imagem, uma onde os valores de noisemi sao superiores a 3
 mask1= noisemi>=3
+#segunda mascara 'e uma imagem de zeros com o tamanho de noise
 mask2= np.zeros(noise.shape)
+# espessura das bandas de ruido
 q=5
+#definir na mascara 2 quais as linhas e colunas que serao iguais a 1
 mask2[q:int(lin/2), 0:q] =1; mask2[int(lin/2):lin-q, 0:q]=1
 mask2[q:int(lin/2), col-q+1:col] =1; mask2[int(lin/2):lin-q, col-q+1:col]=1
+
+#criar uma terceira mascara que 'e uma ifft centrada da segunda mascara
 mask3 = np.fft.ifftshift(mask2)
+#cria uma mascara 4 que 'e a disjuncao entre a juncao das mascaras 1 e 3
 mask4 = np.logical_not(np.logical_and(mask1,mask3))
+#cria uma mascara x que 'e a disjuncao entre a juncao das mascaras 1 e 2
 maskx = np.logical_not(np.logical_and(mask1,mask2)) 
-test=np.abs(np.fft.ifft2(maskx*noisedfft))
+#a filtragem 'e feita com a inversa da mascara x conv com a dfft original
+noisefilt=np.abs(np.fft.ifft2(maskx*noisedfft))
 
-
+#plot das figuras
 plt.figure()                                                                    
 plt.subplot(251); plt.imshow(noise, 'gray')
 plt.subplot(252); plt.imshow(noisemi, 'gray')
 plt.subplot(253); plt.imshow(mask4, 'gray')
-plt.subplot(254); plt.imshow(test, 'gray')
+plt.subplot(254); plt.imshow(noisefilt, 'gray')
+
+# ex 4
+#imagem Marylin - ima
+
+ima=imread('Marilyn.tif')
+
+
+Mfiltro0 = np.ones((11,11))/(11*11)
+Ma = lin-11
+Mb = col-11
+
+Mfiltro1=np.pad(Mfiltro0, [(Ma//2, ), (Mb//2, )], mode='constant')
+Mfiltro2=np.fft.fftshift(Mfiltro1)
+ima_filtrada= np.fft.ifft2(Mfiltro1*ima)
+
+plt.figure()                                                                    
+plt.subplot(251); plt.imshow(ima_filtrada, 'gray')
+plt.subplot(252); plt.imshow(Mfiltro2, 'gray')
+
