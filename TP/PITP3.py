@@ -10,7 +10,7 @@ plt.close('all')
 laptop='C:/Users/Eow/Desktop/Mestrado/PDI/TP'
 pc='C:/Users/silam/OneDrive/Desktop/Mestrado/PDI/TP'
 #changing directory to where the image is located
-os.chdir(pc)
+os.chdir(laptop)
 
 
 #ex1
@@ -282,18 +282,32 @@ plt.subplot(254); plt.imshow(noisefilt, 'gray')
 # ex 4
 #imagem Marylin - ima
 
-ima=imread('Marilyn.tif')
+Mari=imread('Marilyn03.tif')
 
-
+lin, col = Mari.shape
 Mfiltro0 = np.ones((11,11))/(11*11)
 Ma = lin-11
 Mb = col-11
 
 Mfiltro1=np.pad(Mfiltro0, [(Ma//2, ), (Mb//2, )], mode='constant')
 Mfiltro2=np.fft.fftshift(Mfiltro1)
-ima_filtrada= np.fft.ifft2(Mfiltro1*ima)
 
-plt.figure()                                                                    
-plt.subplot(251); plt.imshow(ima_filtrada, 'gray')
-plt.subplot(252); plt.imshow(Mfiltro2, 'gray')
+#Espacial
+Res1 = scipy.ndimage.convolve(Mari, Mfiltro0, mode='constant', cval=0)
 
+#Fourier
+dftMari= np.fft.fft2(Mari)
+especMari = np.log10(np.abs(dftMari))
+dftMfiltro2=np.fft.fft2(Mfiltro2)
+espectrofiltro=np.log10(np.abs(dftMfiltro2))
+
+Mari_mult= dftMari*dftMfiltro2
+Mari_filtrada= np.fft.ifft2(Mari_mult)
+
+plt.figure()                                
+plt.subplot(261); plt.imshow(Mari, 'gray')                                   
+plt.subplot(262); plt.imshow(Res1, 'gray')
+plt.subplot(263); plt.imshow(Mfiltro1, 'gray')
+plt.subplot(264); plt.imshow(espectrofiltro, 'gray')
+plt.subplot(265); plt.imshow(np.log10(np.abs(Mari_mult)), 'gray')
+plt.subplot(266); plt.imshow(np.abs(Mari_filtrada), 'gray')
