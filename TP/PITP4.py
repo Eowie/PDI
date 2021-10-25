@@ -140,16 +140,64 @@ aresta2 = binary_closing(Img3corner, se5)
 plt.figure()
 plt.imshow(aresta1|aresta2)
 
+
+
 #exercicio 3
 
-# def reconstrucao_bin(mask, marker):
-#     serb = rectangle(3,3)
-#     ant = np.zeros(mask.shape)
-#     R= np.copy(marker)
-#     while np.array_equal(R, ant)== False:
-#         ant = R
-#         R = ...
-#     return R
+Img4=imread('bin04.tif')>0
 
-    
+#3.1
+
+def reconstrucao_bin(mask, marker):
+    serb = rectangle(3,3)
+    ant = np.zeros(mask.shape)
+    R= np.copy(marker)
+    while np.array_equal(R, ant)== False:
+        ant = R
+        R = binary_dilation(R,serb)&mask
+    return R
+
+
+#3.2
+
+mold=np.zeros(Img4.shape).astype(bool)
+mold[:,0]=True
+mold[:,-1]=True
+mold[0,:]=True
+mold[-1,:]=True
+
+
+inters=Img4 & mold
+obj= reconstrucao_bin(Img4,inters)
+
+
+
+subt = Img4 & ~obj
+
+plt.figure()
+plt.subplot(131); plt.imshow(Img4, 'gray')
+plt.subplot(132); plt.imshow(obj, 'gray')
+plt.subplot(133); plt.imshow(subt, 'gray')
+
+
+#3.3
+
+circleee=disk(30)
+circle3=binary_opening(subt,circleee)
+
+saliencias_ruido= subt&~circle3
+
+saliencias_final=reconstrucao_bin(saliencias_ruido, circle3)
+
+
+
+plt.figure()
+plt.subplot(141); plt.imshow(subt, 'gray')
+plt.subplot(142); plt.imshow(circle3, 'gray')
+plt.subplot(143); plt.imshow(saliencias_ruido, 'gray')
+plt.subplot(144); plt.imshow(saliencias_final, 'gray')
+
+
+
+
     
