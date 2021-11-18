@@ -16,7 +16,7 @@ plt.close('all')
 laptop='C:/Users/Eow/Desktop/Mestrado/PDI/TP'
 pc='C:/Users/silam/OneDrive/Desktop/Mestrado/PDI/TP'
 
-os.chdir(laptop)
+os.chdir(pc)
 
 f=imread('noisyland.tif').astype(float)
 
@@ -39,13 +39,13 @@ somaf=f_pb+f_pa
                         
 
 #criar um filtro com tamanho de bandas que contenham o ruido
-filtroruido = np.ones((301,51))/(51*301)
+filtroruido = np.ones((301,7))/(7*301)
 pb1 = ndimage.convolve(f, filtroruido, mode='constant', cval=0)
 pa1 = f-pb1
 
 #criar um filtro com tamanho de bandas mais pequeno que o ruido
 #se mudar-mos o tamanho dos filtros podemos tentar encontrar uma melhor solucao
-filtroruido2 = np.ones((301,3))/(3*301)
+filtroruido2 = np.ones((301,1))/(1*301)
 
 pb2 = ndimage.convolve(f, filtroruido2, mode='constant', cval=0)
 pa2 = f-pb2
