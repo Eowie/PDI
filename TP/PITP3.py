@@ -10,7 +10,7 @@ plt.close('all')
 laptop='C:/Users/Eow/Desktop/Mestrado/PDI/TP'
 pc='C:/Users/silam/OneDrive/Desktop/Mestrado/PDI/TP'
 #changing directory to where the image is located
-os.chdir(laptop)
+os.chdir(pc)
 
 
 #ex1
