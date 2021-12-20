@@ -62,6 +62,8 @@ reconstrucao_dual_dist= reconstrucao_dual(funcao_dist,mini_dist)
 #minimo regional
 minimo_reg = reconstrucao_dual_dist - funcao_dist
 
+
+
 #Função watershed para cálculo da linha do rio
 marker,n= ndimage.label(minimo_reg)
 W = watershed(fecho, marker, mask = np.ones(fecho.shape))
@@ -72,7 +74,6 @@ Lint_bin=Lint>0
 Linha_imagem = IMG1 * np.logical_not(Lint_bin) + Lint_bin*255
 
 
-
 #Output final
 plt.figure(figsize=(15,10))
 plt.subplot(121);plt.imshow(IMG1_bin,'gray')
@@ -80,54 +81,54 @@ plt.title('Imagem binária'); plt.axis('off')
 plt.subplot(122);plt.imshow(Linha_imagem,'gray')
 plt.title('Linha média do leito do rio'); plt.axis('off')
 
-# #%%
-# #EXERCICIO 2
+#%%
+#EXERCICIO 2
 
-# #Importação e divisão da imagem RGB nas 3 bandas
-# img2=imread("ik02.tif")
-# img2_r=img2[:,:,0]
-# img2_g=img2[:,:,1]
-# img2_b=img2[:,:,2]
+#Importação e divisão da imagem RGB nas 3 bandas
+img2=imread("ik02.tif")
+img2_r=img2[:,:,0]
+img2_g=img2[:,:,1]
+img2_b=img2[:,:,2]
 
-# #Média das 3 bandas
-# IMG2=np.uint(img2_r/3 + img2_g/3 + img2_b/3)
+#Média das 3 bandas
+IMG2=np.uint(img2_r/3 + img2_g/3 + img2_b/3)
 
-# #Função da reconstrucao geodesica binaria
-# def reconstrucao_bin (mask,marker):
-#     se= rectangle(3,3)
-#     ant=np.zeros(mask.shape)
-#     R=np.copy(marker)
-#     while np.array_equal(R,ant) == False:
-#         ant = R
-#         R=np.logical_and(binary_dilation(R,se),mask)
-#     return R
+#Função da reconstrucao geodesica binaria
+def reconstrucao_bin (mask,marker):
+    se= rectangle(3,3)
+    ant=np.zeros(mask.shape)
+    R=np.copy(marker)
+    while np.array_equal(R,ant) == False:
+        ant = R
+        R=np.logical_and(binary_dilation(R,se),mask)
+    return R
 
-# #Threshold dos valores da imagem da média das bandas para isolar as estradas
-# t2 = 250
-# t1 = 198
-# X = IMG2 <= t1
-# Y = IMG2 >= t2
+#Threshold dos valores da imagem da média das bandas para isolar as estradas
+t2 = 250
+t1 = 198
+X = IMG2 <= t1
+Y = IMG2 >= t2
 
-# #Aplicação da reconstrução à imagem binária anterior para obter a imagem binária desejada
-# M = np.logical_not(np.logical_or(X,Y))
-# Z = reconstrucao_bin(M, np.logical_and(binary_dilation(Y, rectangle(3, 3)), M))
-# TH3 = np.logical_or(Y, Z) #Imagem binária desejada
+#Aplicação da reconstrução à imagem binária anterior para obter a imagem binária desejada
+M = np.logical_not(np.logical_or(X,Y))
+Z = reconstrucao_bin(M, np.logical_and(binary_dilation(Y, rectangle(3, 3)), M))
+TH3 = np.logical_or(Y, Z) #Imagem binária desejada
 
-# #Filtragem da imagem binária resultante do passo anterior
-# Dil = binary_dilation(TH3, rectangle(3, 3)) #Dilatação
-# fecho = binary_erosion(Dil,rectangle(3, 3)) #Erosão da dilatação que resulta no fecho da img
+#Filtragem da imagem binária resultante do passo anterior
+Dil = binary_dilation(TH3, rectangle(3, 3)) #Dilatação
+fecho = binary_erosion(Dil,rectangle(3, 3)) #Erosão da dilatação que resulta no fecho da img
 
-# #Multiplicação da imagem do passo anterior pela imagem original para obter o output desejado
-# estradas_final = np.copy(img2) #Cópia da imagem original para obter as cores no output
-# for i in range(img2.shape[2]):
-#    estradas_final[:,:,i] = estradas_final[:,:,i] * fecho
+#Multiplicação da imagem do passo anterior pela imagem original para obter o output desejado
+estradas_final = np.copy(img2) #Cópia da imagem original para obter as cores no output
+for i in range(img2.shape[2]):
+    estradas_final[:,:,i] = estradas_final[:,:,i] * fecho
 
-# #Output final
-# plt.figure(figsize=(15,10))
-# plt.subplot(121);plt.imshow(img2,'gray')
-# plt.title('Imagem original'); plt.axis('off')
-# plt.subplot(122);plt.imshow(estradas_final,'gray')
-# plt.title('Estradas'); plt.axis('off')
+#Output final
+plt.figure(figsize=(15,10))
+plt.subplot(121);plt.imshow(img2,'gray')
+plt.title('Imagem original'); plt.axis('off')
+plt.subplot(122);plt.imshow(estradas_final,'gray')
+plt.title('Estradas'); plt.axis('off')
 
 # #%%
 # # EXERCICIO 3

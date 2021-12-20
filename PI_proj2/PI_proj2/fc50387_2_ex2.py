@@ -5,7 +5,7 @@ fc50387
 """
 
 """Projeto 2 ex2"""
-from skimage.morphology import disk, rectangle, erosion, dilation, opening, closing, local_minima, local_maxima, watershed, binary_erosion, binary_dilation, binary_opening, binary_closing
+from skimage.morphology import disk, rectangle, skeletonize, reconstruction, erosion, dilation, opening, closing, local_minima, local_maxima, watershed, binary_erosion, binary_dilation, binary_opening, binary_closing
 from imageio import imread, imwrite
 from scipy import ndimage
 import matplotlib.pyplot as plt
@@ -44,9 +44,52 @@ img2_bin[img2 < aux] = 0
 
 img2_3bandas = np.copy(img)
 
+#Filtragem da imagem binária resultante do passo anterior
+dil = binary_dilation(img2_bin, rectangle(5, 5)) #Dilatação
+fecho = binary_erosion(dil,rectangle(5, 5)) #Erosão da dilatação que resulta no fecho da img
+
+
+
+def reconstrucao_dual(mask,marker):
+    a=1
+    ee=rectangle(3,3)
+    while a!=0:
+        E=erosion(marker,ee)
+        R=np.maximum(mask.astype(float),E.astype(float))
+        a=np.count_nonzero(marker!=R)
+        marker=deepcopy(R)
+    return R
+
+
+#Medicao da Distancia
+d= ndimage.distance_transform_edt(fecho==1)
+
+#Reconstrucao dual da distancia
+d1=d+1
+rd_d= reconstrucao_dual(d,d1)
+
+#minimo regional
+min_reg = rd_d - d
+
+ee=disk(10)
+#watershed para cálculo da linha do rio
+marker,n= ndimage.label(min_reg)
+W = watershed(fecho, marker, mask = np.ones(fecho.shape))
+Iint = W- erosion(W, ee) #Linha do rio
+
+#linha do rio binaria
+Iint_bin=Iint.astype(bool)
+
+#skeletonize da linha do rio para menor espessura
+sk1=skeletonize(Iint_bin)
+
+a=reconstruction(img2_bin, sk1)
+
+
+
 #Voltar a transformar a imagem binaria numa imagem com 3 bandas
 for i in range(img.shape[2]):
-    img2_3bandas[:,:,i] = img[:,:,i] * img2_bin
+    img2_3bandas[:,:,i] = img[:,:,i] * a
     
 img_final = np.copy(img)
 x = 4

@@ -12,7 +12,7 @@ plt.close('all')
 laptop='C:/Users/Eow/Desktop/Mestrado/PDI/TP'
 pc='C:/Users/silam/OneDrive/Desktop/Mestrado/PDI/TP'
 
-os.chdir(laptop)
+os.chdir(pc)
 
 F0=imread('bintree.tif')
 #F0<120 erode parte preta
