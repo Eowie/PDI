@@ -130,56 +130,57 @@ plt.title('Imagem original'); plt.axis('off')
 plt.subplot(122);plt.imshow(estradas_final,'gray')
 plt.title('Estradas'); plt.axis('off')
 
-# #%%
-# # EXERCICIO 3
+#%%
+# EXERCICIO 3
 
-# #Importação e divisão da imagem RGB nas 3 bandas
-# img2=imread("ik02.tif")
-# img2_r=img2[:,:,0]
-# img2_g=img2[:,:,1]
-# img2_b=img2[:,:,2]
+#Importação e divisão da imagem RGB nas 3 bandas
+img2=imread("ik02.tif")
+img2_r=img2[:,:,0]
+img2_g=img2[:,:,1]
+img2_b=img2[:,:,2]
 
-# #Diferença entre a banda do vermelho e do azul para sobressair os telhados
-# dif=img2_r.astype(float)-(img2_b.astype(float))
+#Diferença entre a banda do vermelho e do azul para sobressair os telhados
+dif=img2_r.astype(float)-(img2_b.astype(float))
 
-# #Histograma
-# h, r = np.histogram(dif, bins = 256, range=(0,256))
+#Histograma
+h, r = np.histogram(dif, bins = 256, range=(0,256))
 
-# # Funçao distancia maxima
-# xmax=np.where(h==np.max(h));xmax=xmax[0][0] #valor máximo em x no histograma
-# x1=xmax
-# y1= h[x1] #valor de y correspondente ao valor de x máximo
-# x2=255 
-# y2=h[x2] #valor de y correspondente ao valor de x=255
-# a1=(y2-y1)/(x2-x1) #declive da curva
-# b1=y1-a1*x1
-# a2=-(1/a1)
-# b2=np.zeros((256)); x=np.copy(b2); y=np.copy(b2); d=np.copy(b2)
-# for i in range(x1,x2):
-#     b2[i]=h[i]-a2*i
-#     x[i]=(b1-b2[i])/(a2-a1)
-#     y[i]=a2*(b1-b2[i])/(a2-a1)+b2[i]
-#     d[i]=np.sqrt((x[i]-i)**2+(y[i]-h[i])**2)
+# Funçao distancia maxima
+xmax=np.where(h==np.max(h));xmax=xmax[0][0] #valor máximo em x no histograma
+x1=xmax
+y1= h[x1] #valor de y correspondente ao valor de x máximo
+x2=255 
+y2=h[x2] #valor de y correspondente ao valor de x=255
+a1=(y2-y1)/(x2-x1) #declive da curva
+b1=y1-a1*x1
+a2=-(1/a1)
+b2=np.zeros((256)); x=np.copy(b2); y=np.copy(b2); d=np.copy(b2)
+for i in range(x1,x2):
+    b2[i]=h[i]-a2*i
+    x[i]=(b1-b2[i])/(a2-a1)
+    y[i]=a2*(b1-b2[i])/(a2-a1)+b2[i]
+    d[i]=np.sqrt((x[i]-i)**2+(y[i]-h[i])**2)
     
-# th=np.where(d==np.max(d));th=th[0][0] #Valor que vai originar o threshold
-# #threshold
-# telhados = dif < th
+th=np.where(d==np.max(d));th=th[0][0] #Valor que vai originar o threshold
+#threshold
+telhados = dif < th
 
-# #Multiplicação da imagem por 1 para ter a imagem binária com valores 0 e 1
-# telhados=telhados*1 
-
-# #Ciclo que suaviza a imagem e multiplica a imagem binária anterior pela imagem original
-# telhados_final = np.copy(img2)
-# for i in range(img2.shape[2]):
-#     telhados_final[:,:,i] = telhados_final[:,:,i] * np.logical_not(telhados) #Terá de ser o inverso da imagem binária
-#     telhados_final[:,:,i] = erosion(telhados_final[:,:,i], rectangle(3,3))
-#     telhados_final[:,:,i] = dilation(telhados_final[:,:,i], rectangle(3,3))
+#Multiplicação da imagem por 1 para ter a imagem binária com valores 0 e 1
+telhados=telhados*1 
 
 
-# #Output final
-# plt.figure(figsize=(15,10))
-# plt.subplot(121);plt.imshow(img2,'gray')
-# plt.title('Imagem original'); plt.axis('off')
-# plt.subplot(122);plt.imshow(telhados_final,'gray')
-# plt.title('Telhados das casas'); plt.axis('off')
+#Ciclo que suaviza a imagem e multiplica a imagem binária anterior pela imagem original
+telhados_final = np.copy(img2)
+for i in range(img2.shape[2]):
+    telhados_final[:,:,i] = telhados_final[:,:,i] * np.logical_not(telhados) #Terá de ser o inverso da imagem binária
+    telhados_final[:,:,i] = erosion(telhados_final[:,:,i], rectangle(3,3))
+    telhados_final[:,:,i] = dilation(telhados_final[:,:,i], rectangle(3,3))
+
+
+#Output final
+plt.figure(figsize=(15,10))
+plt.subplot(121);plt.imshow(img2,'gray')
+plt.title('Imagem original'); plt.axis('off')
+plt.subplot(122);plt.imshow(telhados_final,'gray')
+plt.title('Telhados das casas'); plt.axis('off')
 

@@ -22,7 +22,7 @@ plt.close('all')
 laptop='C:/Users/Eow/Desktop/Mestrado/PDI/TP'
 pc='C:/Users/silam/OneDrive/Desktop/Mestrado/PDI/TP'
 
-os.chdir(laptop)
+os.chdir(pc)
 
 #%%
 #Ex 1.1
@@ -136,11 +136,11 @@ th=np.where(dist==np.max(dist))[0][0]
 #th=np.argmax(d) igual ao de cima
 
 
-# plt.figure(figsize=(20,15))
-# plt.subplot(231); plt.imshow(zebra, 'gray'); plt.title('Inicial'); plt.axis('off')
-# plt.subplot(232); plt.plot(uu); plt.title('Histograma'); plt.axis('off')
-# plt.subplot(233); plt.imshow(zebra<=th,'gray'); plt.title('distmax'); plt.axis('off')
-# plt.subplot(234); plt.imshow(zebra>=th,'gray'); plt.title('distmax'); plt.axis('off')
+plt.figure(figsize=(20,15))
+plt.subplot(231); plt.imshow(zebra, 'gray'); plt.title('Inicial'); plt.axis('off')
+plt.subplot(232); plt.plot(uu); plt.title('Histograma'); plt.axis('off')
+plt.subplot(233); plt.imshow(zebra<=th,'gray'); plt.title('distmax'); plt.axis('off')
+plt.subplot(234); plt.imshow(zebra>=th,'gray'); plt.title('distmax'); plt.axis('off')
 
 # plt.figure()
 # plt.plot(uu)
