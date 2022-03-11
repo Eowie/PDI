@@ -18,7 +18,7 @@ plt.close('all')
 laptop='C:/Users/Eow/Desktop/Mestrado/PDI/TP'
 pc='C:/Users/silam/OneDrive/Desktop/Mestrado/PDI/TP'
 #changing directory to where the image is located
-os.chdir(laptop)
+os.chdir(pc)
 
 
 #abrir imagem de 8 bits as type float - permite que sejam feitas operacoes
@@ -43,8 +43,8 @@ filtro = np.array([[1,1,1],
 #em cima 'e o mesmo que
 #filtro= np.ones((3,3))/9
 
-filtro1= np.ones((5,5))
-filtro2= np.ones((9,9))
+filtro1= np.ones((3,3))/9
+filtro2= np.ones((9,9))/81
             
 
 #define a convolucao da media manualmente
@@ -66,7 +66,7 @@ plt.figure(figsize=(14,5));
 plt.subplot(141); plt.imshow(  Img, 'gray'); plt.axis('off'), plt.title(nome);
 plt.subplot(142); plt.imshow(conv0, 'gray'); plt.axis('off'),plt.title('Conv0')
 plt.subplot(143); plt.imshow(conv1, 'gray'); plt.axis('off'),plt.title('Conv1')
-plt.subplot(144); plt.imshow(conv1, 'gray'); plt.axis('off'),plt.title('Conv2')
+plt.subplot(144); plt.imshow(conv2, 'gray'); plt.axis('off'),plt.title('Conv2')
 
 #abrir duas imagens com ruido as type float
 gauss= imread('noisy_gauss.tif').astype(float)
@@ -100,12 +100,14 @@ plt.subplot(248); plt.imshow(median_denoisedsp, 'gray'); plt.axis('off'),plt.tit
 px = ndimage.prewitt(Img, axis=0, mode='constant')
 py = ndimage.prewitt(Img, axis=1, mode='constant')
 prw = np.abs(px)+np.abs(py)
+prw= prw*255
 
 # Sobel Filter
 #applies mask over x and then over y and combines the two
 sx = ndimage.sobel(Img, axis=0, mode='constant')
 sy = ndimage.sobel(Img, axis=1, mode='constant')
 sob= np.hypot(sx, sy)
+sob=sob*255
 
 #plot results above
 plt.figure(figsize=(14,5))

@@ -1,66 +1,82 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Dec 29 22:16:40 2021
+Created on Sat Feb  5 05:11:17 2022
 
 @author: silam
 """
 
+from imageio import imread
+import os
+import matplotlib.pyplot as plt
 import numpy as np
-import math
+from scipy import ndimage
+from skimage.morphology import disk, rectangle, reconstruction, \
+    binary_erosion, binary_dilation, binary_opening, binary_closing
+    
+    
 
-R3= np.array([[0.998360417,-0.057240522, 0],
-      [0.057240522, 0.998360417, 0],
-      [0,0,1]])
+# filtros passa baixa
+filtro = np.array([[1,1,1],
+                   [1,1,1],
+                   [1,1,1]],
+                  dtype='float')/9
 
+matriz = ([90,76,42,77,73,74,120,78,80,83],
+          [89,74,70,73,72,71,73,200,77,20],
+          [89,72,68,70,70,40,70,71,76,80],
+          [87,71,70,00,68,69,68,71,73,70],
+          [86,50,68,68,66,67,69,70,70,72],
+          [85,102,66,65,66,65,67,69,70,72],
+          [82,66,64,64,66,5,67,69,50,70],
+          [83,66,63,63,00,65,68,70,72,72],
+          [82,66,64,64,63,65,67,69,73,74],
+          [85,85,96,34,57,85,86,98,72,102])
+                  
+conv1 = ndimage.convolve(matriz, filtro, mode='constant', cval=0)
+gauss = ndimage.filters.gaussian_filter(matriz, 1)
+median = ndimage.filters.median_filter(matriz,3)
 
-R3x= np.array([[-0.990238,0.139386, 0],
-      [0.139386, 0.990238, 0],
-      [0,0,1]])
+filtro2 = np.array([[-1,-1,-1],
+                   [-1,8,-1],
+                   [-1,-1,-1]],
+                  dtype='float')/9
 
-R2= np.array([[0.634275267, 0, -0.773107],
-      [0, 1, 0],
-      [   0.773107, 0,0.634275267]])
+conv2 = ndimage.convolve(matriz, filtro2, mode='constant', cval=0)
+test = matriz - conv1
 
-P = np.array([[1,0,0],
-              [0,-1,0],
-              [0,0,1]])
+#filtros passa alta
 
-dr=np.array ([[-1238.865],
-              [1809.476],
-              [-85.500]])
-
-
-R=R3x@R2@P@dr
-
-x=4889267.627
-y=-690147.710
-z=4023075.788
-
-dx = -230.994
-dy = 102.591
-dz = 25.199
-alfa=1.00000195
-thx=(-0.633/3600)*math.pi/180
-thy=(0.239/3600)*math.pi/180
-thz=(-0.9/3600)*math.pi/180
-
-x1=dx+alfa*x+alfa*thz*y-alfa*thy*z
-y1=dy-alfa*thz*x+alfa*y+alfa*thx*z
-z1=dz+alfa*thy*x-alfa*thx*y+alfa*z
-
-e=0.00672267
-a=6378137
-
-fi0=(1/1-e)*z1/math.sqrt(x1**2+y1**2)
-N0=a/math.sqrt(1-e*math.sin(fi0))
-
-fi1=(z1+e*N0*math.sin(fi0))/math.sqrt(x1**2+y1**2)
-N1=a/math.sqrt(1-e*math.sin(fi1))
+rob_v = np.array( [[1, 0 ],
+                   [0,-1 ]] )
+  
+rob_h = np.array( [[ 0, 1 ],
+                   [ -1, 0 ]] )
+  
+roby=ndimage.convolve(matriz,rob_v)
+robx=ndimage.convolve(matriz,rob_h)
+rob=np.abs(roby)+np.abs(robx)
 
 
-fi2=(z1+e*N1*math.sin(fi1))/math.sqrt(x1**2+y1**2)
-N2=a/math.sqrt(1-e*math.sin(fi2))
+sx = ndimage.sobel(matriz, axis=0, mode='constant')
+sy = ndimage.sobel(matriz, axis=1, mode='constant')
+sob= np.hypot(sx, sy)
+
+px = ndimage.prewitt(matriz, axis=0, mode='constant')
+py = ndimage.prewitt(matriz, axis=1, mode='constant')
+prw = np.abs(px)+np.abs(py)
+
+#filtros passa banda
+
+pb_media= ndimage.convolve(matriz,filtro,mode='constant', cval=0)
+pb1 = matriz - pb_media
+k3=0.6
+pb = matriz+k3*pb1
 
 
-h=((math.sqrt(x1**2+y1**2))/math.cos(fi2))
-h1=h-N2
+
+ee = ([1,1,1],
+     [1,1,1],
+     [1,1,1])
+
+
+be=binary_erosion(matriz2,ee)

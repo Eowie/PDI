@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 plt.close('all')
 
 #changing directory to where the image is located
-os.chdir('C:/Users/silam/OneDrive/Desktop')
+# os.chdir('C:/Users/silam/OneDrive/Desktop')
 #assign variable ima to a read of the picture we want to use
 ima=imread('lena.tif')
 
